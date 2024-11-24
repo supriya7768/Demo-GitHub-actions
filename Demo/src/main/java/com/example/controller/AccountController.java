@@ -18,11 +18,6 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
-    @GetMapping("/hello")
-    public void hello(){
-        System.out.println("Hello");
-    }
-
     @PostMapping
     public ResponseEntity<Account> createAccount(@RequestBody Account account){
         log.info("Account create request is received");
