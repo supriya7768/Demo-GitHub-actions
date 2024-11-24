@@ -1,4 +1,4 @@
-FROM postman/newman:5.3.2-alpine
+FROM postman/newman:latest
 WORKDIR /etc/newman
 
 # Copy Collection and Environment files
