@@ -36,15 +36,11 @@ jobs:
     - name: Run Gradle Build
       run: ./gradlew build  # Build the project
 
-    # Step 6: Build the Web Service Docker Image
-    - name: Build Docker Image
-      run: docker build -t demo-app .  # Build the Docker image for the web service
+    # Step 6: Start Services with Docker Compose
+    - name: Start Services with Docker Compose
+      run: docker-compose up -d  # Start all services in the background
 
-    # Step 7: Run the Web Service Docker Container
-    - name: Run Docker Container
-      run: docker run -d -p 8080:8080 --name demo-app-container demo-app  # Run the Docker container for the web service
-
-    # Step 8: Run Postman Tests with Newman (Official Docker Image)
+    # Step 7: Run Postman Tests with Newman (Official Docker Image)
     - name: Run Postman Tests with Newman
       run: |
         docker run --rm \
@@ -53,14 +49,14 @@ jobs:
           -e /etc/newman/postman_environment.json \
           --reporters cli,json \
           --reporter-json-export /etc/newman/newman-report.json
-    # Step 9: Publish Test Results to GitHub Packages (optional)
+
+    # Step 8: Publish Test Results to GitHub Packages (optional)
     - name: Publish Test Results to GitHub Packages
       run: |
         docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-        docker tag demo-app ghcr.io/${{ github.repository }}/demo-app:latest
+        docker tag demo ghcr.io/${{ github.repository }}/demo-app:latest
         docker push ghcr.io/${{ github.repository }}/demo-app:latest
-    # Optional: Clean up Docker containers after tests
-    - name: Clean up Docker Containers
-      run: |
-        docker rm -f demo-app-container
-        docker rmi demo-app
+
+    # Step 9: Clean up Docker Compose
+    - name: Clean up Docker Compose
+      run: docker-compose down --volumes  # Stop and remove all services and volumes
