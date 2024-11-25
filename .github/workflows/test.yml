@@ -2,40 +2,67 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "main"
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Check out the code
     - uses: actions/checkout@v4  # Check out the code from the repository
 
+    # Step 2: Set up JDK 21
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
 
+    # Step 3: Set execute permission for gradlew
     - name: Set execute permission for gradlew
       run: chmod +x ./gradlew  # Give permission to the Gradle wrapper
 
+    # Step 4: Set up Gradle
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4  # Set up Gradle
 
+    # Step 5: Build the project using Gradle
     - name: Run Gradle Build
       run: ./gradlew build  # Build the project
 
-    # Build the Docker image and run the container
+    # Step 6: Build the Web Service Docker Image
     - name: Build Docker Image
-      run: docker build -t demo-app .  # Build the Docker image
+      run: docker build -t demo-app .  # Build the Docker image for the web service
 
+    # Step 7: Run the Web Service Docker Container
     - name: Run Docker Container
-      run: docker run -d -p 8080:8080 --name demo-app-container demo-app  # Run the Docker container
+      run: docker run -d -p 8080:8080 --name demo-app-container demo-app  # Run the Docker container for the web service
 
-    # Clean up after the test
-    - name: Clean up Docker Container
-      run: docker rm -f demo-app-container  # Remove the Docker container after tests
+    # Step 8: Run Postman Tests with Newman (Official Docker Image)
+    - name: Run Postman Tests with Newman
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/etc/newman \
+          postman/newman:latest run /etc/newman/postman_collection.json \
+          -e /etc/newman/postman_environment.json \
+          --reporters cli,json \
+          --reporter-json-export /etc/newman/newman-report.json
+
+    # Step 9: Publish Test Results to GitHub Packages (optional)
+    - name: Publish Test Results to GitHub Packages
+      run: |
+        docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+        docker tag demo-app ghcr.io/${{ github.repository }}/demo-app:latest
+        docker push ghcr.io/${{ github.repository }}/demo-app:latest
+
+    # Optional: Clean up Docker containers after tests
+    - name: Clean up Docker Containers
+      run: |
+        docker rm -f demo-app-container
+        docker rmi demo-app
