@@ -48,16 +48,17 @@ jobs:
     - name: Run Postman Collection Tests with Newman
       uses: postman/newman-action@v1.1.0
       with:
-        collection: './postman_collection.json'
-        environment: './postman_environment.json'
-        reporters: 'cli,junit'
-        reporter-junit-export: 'newman-{{runTestSummary.timestamp}}.xml'
+        collection: './postman_collection.json'  # Path to your Postman collection
+        environment: './postman_environment.json'  # Path to your Postman environment file
+        reporters: 'cli,junit'  # Choose the reporters you need (CLI and JUnit)
+        reporter-junit-export: 'newman-{{runTestSummary.timestamp}}.xml'  # Output the JUnit XML result
 
+    # Step 9: Publish Test Results to GitHub Packages (Updated to v3)
     - name: Publish Test Results to GitHub Packages
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3  # Updated to v3
       with:
         name: test-results
-        path: newman-*.xml
+        path: newman-*.xml  # Publish the test result files
 
     # Optional: Clean up Docker containers after tests
     - name: Clean up Docker Containers
