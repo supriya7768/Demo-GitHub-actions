@@ -45,21 +45,19 @@ jobs:
       run: docker run -d -p 8080:8080 --name demo-app-container demo-app  # Run the Docker container for the web service
 
     # Step 8: Run Postman Tests with Newman (Official Docker Image)
-    - name: Run Postman Tests with Newman
-      run: |
-        docker run --rm \
-          -v ${{ github.workspace }}:/etc/newman \
-          postman/newman:latest run /etc/newman/postman_collection.json \
-          -e /etc/newman/postman_environment.json \
-          --reporters cli,json \
-          --reporter-json-export /etc/newman/newman-report.json
+    - name: Run Postman Collection Tests with Newman
+      uses: postman/newman-action@v1.1.0
+      with:
+        collection: './postman_collection.json'
+        environment: './postman_environment.json'
+        reporters: 'cli,junit'
+        reporter-junit-export: 'newman-{{runTestSummary.timestamp}}.xml'
 
-    # Step 9: Publish Test Results to GitHub Packages (optional)
     - name: Publish Test Results to GitHub Packages
-      run: |
-        docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-        docker tag demo-app ghcr.io/${{ github.repository }}/demo-app:latest
-        docker push ghcr.io/${{ github.repository }}/demo-app:latest
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: newman-*.xml
 
     # Optional: Clean up Docker containers after tests
     - name: Clean up Docker Containers
