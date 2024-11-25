@@ -1,9 +1,9 @@
-FROM postman/newman:latest
-WORKDIR /etc/newman
+FROM mcr.microsoft.com/openjdk/jdk:21-ubuntu
 
-# Copy Collection and Environment files
-COPY postman_collection.json .
-COPY postman_environment.json .
+WORKDIR /demo
 
-# Default command
-CMD ["run", "postman_collection.json", "--environment", "postman_environment.json", "--reporters", "cli,json", "--reporter-json-export", "newman-report.json"]
+COPY /build/libs/Demo-0.0.1-SNAPSHOT.jar demo.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar","demo.jar"]
