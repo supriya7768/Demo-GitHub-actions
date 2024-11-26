@@ -35,57 +35,45 @@ jobs:
     - name: Build the Docker Image
       run: docker build . --file Dockerfile --tag demo-app
     
-    - name: Create Docker Network
-      run: docker network create docker-network || true
-    
     - name: Start Services
       run: docker compose up -d
     
     - name: Wait for Services to be Ready
       run: |
-        # Add a wait mechanism
-        for i in {1..30}; do
-          docker compose ps | grep "Up" && break
-          sleep 2
-        done
+        # Wait for services to start
+        sleep 30
+        docker compose ps
         docker compose logs
     
-    - name: Resolve Hostname
+    - name: Get Container IP
+      id: get-ip
       run: |
-        # Debug DNS resolution
-        cat /etc/hosts
-        cat /etc/resolv.conf
-        ping -c 4 localhost
-        docker network inspect docker-network
-        docker inspect demo-github-actions-demo
+        CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' demo-github-actions-demo)
+        echo "CONTAINER_IP=$CONTAINER_IP" >> $GITHUB_OUTPUT
+        echo "Container IP: $CONTAINER_IP"
     
     - name: Run Postman Tests
+      env:
+        CONTAINER_IP: ${{ steps.get-ip.outputs.CONTAINER_IP }}
       run: |
-        # Try multiple approaches
-        docker run --rm \
-          --network host \
-          -v ${{ github.workspace }}:/etc/newman \
-          postman/newman:latest run /etc/newman/postman_collection.json \
-          -e /etc/newman/postman_environment.json \
-          --reporters cli,json \
-          --reporter-json-export /etc/newman/newman-report.json
-      continue-on-error: true
-    
-    - name: Alternative Test Method
-      run: |
-        # Use IP instead of hostname
-        CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' demo-github-actions-demo)
-        sed -i "s|http://demo:8080|http://$CONTAINER_IP:8080|g" postman_environment.json
+        # Update Postman environment with container IP
+        sed -i "s|\"value\": \"http://demo:8080\"|\"value\": \"http://$CONTAINER_IP:8080\"|g" postman_environment.json
         
         docker run --rm \
-          --network docker-network \
+          --network bridge \
           -v ${{ github.workspace }}:/etc/newman \
           postman/newman:latest run /etc/newman/postman_collection.json \
           -e /etc/newman/postman_environment.json \
           --reporters cli,json \
           --reporter-json-export /etc/newman/newman-report.json
-      continue-on-error: true
     
     - name: Cleanup
       run: docker compose down
+      if: always()
+    
+    - name: Upload Postman Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: newman-report
+        path: newman-report.json
       if: always()

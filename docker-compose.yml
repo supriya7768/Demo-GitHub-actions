@@ -16,7 +16,6 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
     networks:
       - docker-network
-      - host-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -32,13 +31,10 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - docker-network
-      - host-network
 
 networks:
   docker-network:
     driver: bridge
-  host-network:
-    driver: host
 
 volumes:
   pgdata:
