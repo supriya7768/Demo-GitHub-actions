@@ -1,22 +1,26 @@
 version: '3'
+
 services:
   demo:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: demo-app-container
+    image: demo-app:latest
     ports:
       - "8080:8080"
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/Demo
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/Demo
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
     networks:
-      - app-network
+      - docker-network
 
   postgres:
     image: postgres:latest
+    container_name: postgres-db
     environment:
       POSTGRES_DB: Demo
       POSTGRES_USER: postgres
@@ -26,29 +30,10 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - app-network
-
-  newman:
-    image: postman/newman:latest
-    container_name: newman-container
-    entrypoint: >
-      /bin/sh -c "
-      while ! curl -s http://demo:8080/actuator/health | grep '\"status\":\"UP\"'; do
-      echo 'Waiting for demo service to be ready...'; sleep 5; done;
-      newman run /etc/newman/postman_collection.json
-        --environment /etc/newman/postman_environment.json
-        --reporters cli,json
-        --reporter-json-export /etc/newman/newman-report.json"
-    volumes:
-      - ./postman_collection.json:/etc/newman/postman_collection.json
-      - ./postman_environment.json:/etc/newman/postman_environment.json
-    depends_on:
-      - demo
-    networks:
-      - app-network
+      - docker-network
 
 networks:
-  app-network:
+  docker-network:
     driver: bridge
 
 volumes:
