@@ -46,23 +46,21 @@ jobs:
        password: ${{ secrets.GITHUB_TOKEN }}
 
    # Run container image of application
-    - name: Run application in container to scan with ZAP
+    - name: Run application in container
       run: |
        docker rm -f demo-github-actions-demo || true
        docker rm -f postgres:latest || true
        docker container prune --force || true
        docker compose up -d
 
-    # - name: Wait 60 seconds to start application
-    #   run: sleep 60
+    - name: Wait 60 seconds to start application
+      run: sleep 60
 
     # Step 7: Run Postman Tests with Newman (Official Docker Image)
     - name: Run Postman Tests with Newman
       run: |
-        docker run --rm \
-          -v ${{ github.workspace }}:/etc/newman \
-          postman/newman:latest run /etc/newman/postman_collection.json \
-          -e /etc/newman/postman_environment.json \
+        docker-compose exec newman newman run /etc/newman/postman_collection.json \
+          --environment /etc/newman/postman_environment.json \
           --reporters cli,json \
           --reporter-json-export /etc/newman/newman-report.json
 
