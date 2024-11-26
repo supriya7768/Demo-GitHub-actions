@@ -53,8 +53,8 @@ jobs:
        docker container prune --force || true
        docker compose up -d
 
-    - name: Wait 60 seconds to start application
-      run: sleep 60
+    # - name: Wait 60 seconds to start application
+    #   run: sleep 60
 
     # Step 7: Run Postman Tests with Newman (Official Docker Image)
     - name: Run Postman Tests with Newman
