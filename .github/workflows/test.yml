@@ -44,19 +44,20 @@ jobs:
     - name : Pull Newman Docker Image
       run : docker pull postman/newman:latest
 
-    - name : Run Tests using Newman
-      uses: postman/newman-action@v1.1.0
-      with:
-        collection: './postman_collection.json'
-        environment: './postman_environment.json'
-        reporters: 'cli,junit'
-        reporter-junit-export: 'newman-{{runTestSummary.timestamp}}.xml'
+    - name: Run Postman Tests with Newman
+      run: |
+       docker run --rm \
+         -v ${{ github.workspace }}:/etc/newman \
+         postman/newman:latest run /etc/newman/postman_collection.json \
+         -e /etc/newman/postman_environment.json \
+         --reporters cli,json \
+         --reporter-json-export /etc/newman/newman-report.json
 
     - name: Publish Test Results to GitHub Packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: newman-*.xml
+      run: |
+        docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+        docker tag demo ghcr.io/${{ github.repository }}/demo-app:latest
+        docker push ghcr.io/${{ github.repository }}/demo-app:latest
 
     - name : Docker Compose Down
       run : docker compose down
