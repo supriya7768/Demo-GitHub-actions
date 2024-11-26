@@ -24,9 +24,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/account",
-							"host": ["{{base_url}}"],
-							"path": ["account"]
+							"raw": "http://demo-github-actions-demo:8080/account",
+							"protocol": "http",
+							"host": [
+								"demo-github-actions-demo"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
 						}
 					},
 					"response": []
@@ -37,9 +43,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/account",
-							"host": ["{{base_url}}"],
-							"path": ["account"]
+							"raw": "http://demo-github-actions-demo:8080/account",
+							"protocol": "http",
+							"host": [
+								"demo-github-actions-demo"
+							],
+							"port": "8080",
+							"path": [
+								"account"
+							]
 						}
 					},
 					"response": []
@@ -48,7 +60,14 @@
 					"name": "Update Name",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "",
@@ -59,9 +78,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/account/1?name=Bittu",
-							"host": ["{{base_url}}"],
-							"path": ["account", "1"],
+							"raw": "http://demo-github-actions-demo:8080/account/1?name=Bittu",
+							"protocol": "http",
+							"host": [
+								"demo-github-actions-demo"
+							],
+							"port": "8080",
+							"path": [
+								"account",
+								"1"
+							],
 							"query": [
 								{
 									"key": "name",
@@ -78,9 +104,16 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/account/1",
-							"host": ["{{base_url}}"],
-							"path": ["account", "1"]
+							"raw": "http://demo-github-actions-demo:8080/account/1",
+							"protocol": "http",
+							"host": [
+								"demo-github-actions-demo"
+							],
+							"port": "8080",
+							"path": [
+								"account",
+								"1"
+							]
 						}
 					},
 					"response": []

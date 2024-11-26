@@ -1,79 +1,51 @@
-name: Automated functional testing
-
+name: Build Project
+ 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+ 
 permissions:
   contents: read
-
+ 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+ 
     steps:
     - uses: actions/checkout@v4
-    
+   
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
         cache: gradle
-    
+ 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-    
+     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    
+     
     - name: Build and Test with Gradle
       run: ./gradlew build
-    
-    - name: Build the Docker Image
-      run: docker build . --file Dockerfile --tag demo-app
-    
-    - name: Start Services
-      run: docker compose up -d
-    
-    - name: Wait for Services to be Ready
-      run: |
-        # Wait for services to start
-        sleep 30
-        docker compose ps
-        docker compose logs
-    
-    - name: Get Container IP
-      id: get-ip
-      run: |
-        CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' demo-github-actions-demo)
-        echo "CONTAINER_IP=$CONTAINER_IP" >> $GITHUB_OUTPUT
-        echo "Container IP: $CONTAINER_IP"
-    
-    - name: Run Postman Tests
-      env:
-        CONTAINER_IP: ${{ steps.get-ip.outputs.CONTAINER_IP }}
-      run: |
-        # Update Postman environment with container IP
-        sed -i "s|\"value\": \"http://demo:8080\"|\"value\": \"http://$CONTAINER_IP:8080\"|g" postman_environment.json
-        
-        docker run --rm \
-          --network bridge \
-          -v ${{ github.workspace }}:/etc/newman \
-          postman/newman:latest run /etc/newman/postman_collection.json \
-          -e /etc/newman/postman_environment.json \
-          --reporters cli,json \
-          --reporter-json-export /etc/newman/newman-report.json
-    
-    - name: Cleanup
-      run: docker compose down
-      if: always()
-    
-    - name: Upload Postman Test Results
-      uses: actions/upload-artifact@v3
-      with:
-        name: newman-report
-        path: newman-report.json
-      if: always()
+
+    - name : Creating docker network
+      run : docker network create docker-network 
+ 
+    - name : Docker Compose Up
+      run : docker compose up -d
+
+    - name: Wait for container
+      run : sleep 20
+ 
+    - name : Pull Newman Docker Image
+      run : docker pull postman/newman:latest
+   
+    - name : Run Tests using Newman
+      run : docker run --network docker-network -v ${{ github.workspace }}:/workspace postman/newman run /workspace/postman/Demo-Github-actions.postman_collection.json
+ 
+    - name : Docker Compose Down
+      run : docker compose down
