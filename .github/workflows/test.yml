@@ -32,19 +32,29 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4  # Set up Gradle
 
-    - name: Install Docker Compose
-      run: |
-        sudo curl -L "https://github.com/docker/compose/releases/download/2.21.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-        docker-compose --version  # Verify installation
-
     # Step 5: Build the project using Gradle
     - name: Run Gradle Build
       run: ./gradlew build  # Build the project
 
     # Step 6: Start Services with Docker Compose
-    - name: Start Services with Docker Compose
-      run: docker-compose up -d  # Start all services in the background
+     # Login into container registry
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3
+      with:
+       registry: ghcr.io
+       username: ${{ github.actor }}
+       password: ${{ secrets.GITHUB_TOKEN }}
+
+   # Run container image of application
+    - name: Run application in container to scan with ZAP
+      run: |
+       docker rm -f demo-github-actions-demo || true
+       docker rm -f postgres:latest || true
+       docker container prune --force || true
+       docker compose up -d
+
+    - name: Wait 60 seconds to start application
+      run: sleep 60
 
     # Step 7: Run Postman Tests with Newman (Official Docker Image)
     - name: Run Postman Tests with Newman
