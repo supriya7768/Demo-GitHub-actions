@@ -11,6 +11,62 @@
 			"item": [
 				{
 					"name": "Create",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Setting request body dynamically\r",
+									"pm.request.body = {\r",
+									"    mode: 'raw',\r",
+									"    raw: JSON.stringify({\r",
+									"        id : 1,\r",
+									"        name: \"Pintu\",\r",
+									"        city: \"Pune\",\r",
+									"        balance: 1000\r",
+									"    })\r",
+									"};\r",
+									"\r",
+									"// Set header for JSON payload\r",
+									"pm.request.headers.add({ key: \"Content-Type\", value: \"application/json\" });\r",
+									"\r",
+									"// Log the request body for debugging\r",
+									"console.log(\"Pre-request body:\", pm.request.body);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate status code\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Parse the response body\r",
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"// Validate response fields\r",
+									"pm.test(\"Response contains expected fields\", function () {\r",
+									"    pm.expect(responseData).to.have.property(\"id\", 1);\r",
+									"    pm.expect(responseData).to.have.property(\"name\", \"Pintu\");\r",
+									"    pm.expect(responseData).to.have.property(\"city\", \"Pune\");\r",
+									"    pm.expect(responseData).to.have.property(\"balance\", 1000);\r",
+									"});\r",
+									"\r",
+									"// Log the response for debugging\r",
+									"console.log(\"Post-response body:\", responseData);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],

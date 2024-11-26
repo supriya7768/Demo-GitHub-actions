@@ -1,18 +1,18 @@
-name: Build Project
- 
+name: Build and Test Project
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
- 
+
 permissions:
   contents: read
- 
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
- 
+
     steps:
     - uses: actions/checkout@v4
    
@@ -22,7 +22,7 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: gradle
- 
+   
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
      
@@ -32,21 +32,26 @@ jobs:
     - name: Build and Test with Gradle
       run: ./gradlew build
 
-    - name : Creating docker network
-      run : docker network create docker-network 
- 
-    - name : Docker Compose Up
-      run : docker compose up -d
-
-    - name: Wait for container
-      run : sleep 20
- 
-    - name : Pull Newman Docker Image
-      run : docker pull postman/newman:latest
+    - name: Create Docker Network
+      run: docker network create docker-network 
    
-    - name : Run Tests using Newman
-      run : docker run --network docker-network -v /home/runner/work/Demo-GitHub-actions/Demo-GitHub-actions:/workspace postman/newman run /workspace/postman_collection.json
+    - name: Docker Compose Up
+      run: docker compose up -d
 
- 
-    - name : Docker Compose Down
-      run : docker compose down
+    - name: Wait for Container
+      run: sleep 20
+
+    - name: Pull Newman Docker Image
+      run: docker pull postman/newman:latest
+   
+    - name: Run Tests using Newman
+      run: docker run --network docker-network -v ${{ github.workspace }}:/workspace postman/newman:latest run /workspace/postman_collection.json --reporters cli,html --reporter-html-export /workspace/newman-report.html
+   
+    - name: Docker Compose Down
+      run: docker compose down
+
+    - name: Upload Newman Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: newman-report
+        path: newman-report.html
