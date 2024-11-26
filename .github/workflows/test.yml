@@ -45,7 +45,7 @@ jobs:
       run : docker pull postman/newman:latest
 
     - name : Run Tests using Newman
-      run : docker run --network docker-network -v ${{ github.workspace }}:/workspace postman/newman run /workspace/postman/Git-Action-Demo.postman_collection.json
+      run : docker run --network docker-network -v ${{ github.workspace }}:/workspace postman/newman run /workspace/postman/Demo-Github-actions.postman_collection.json
 
     - name : Docker Compose Down
       run : docker compose down
