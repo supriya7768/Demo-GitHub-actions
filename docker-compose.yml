@@ -33,6 +33,7 @@ services:
 networks:
   docker-network:
     driver: bridge
+    external: true
 
 volumes:
   pgdata:
