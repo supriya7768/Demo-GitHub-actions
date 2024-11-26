@@ -53,7 +53,7 @@
 									"// Validate response fields\r",
 									"pm.test(\"Response contains expected fields\", function () {\r",
 									"    pm.expect(responseData).to.have.property(\"id\", 1);\r",
-									"    pm.expect(responseData).to.have.property(\"name\", \"Pintu\");\r",
+									"    pm.expect(responseData).to.have.property(\"name\", \"Pintuu\");\r",
 									"    pm.expect(responseData).to.have.property(\"city\", \"Pune\");\r",
 									"    pm.expect(responseData).to.have.property(\"balance\", 1000);\r",
 									"});\r",
