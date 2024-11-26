@@ -45,7 +45,18 @@ jobs:
       run : docker pull postman/newman:latest
 
     - name : Run Tests using Newman
-      run : docker run --network docker-network -v ${{ github.workspace }}:/workspace postman/newman run /workspace/postman/Demo-Github-actions.postman_collection.json
+      uses: postman/newman-action@v1.1.0
+      with:
+        collection: './postman_collection.json'
+        environment: './postman_environment.json'
+        reporters: 'cli,junit'
+        reporter-junit-export: 'newman-{{runTestSummary.timestamp}}.xml'
+
+    - name: Publish Test Results to GitHub Packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: newman-*.xml
 
     - name : Docker Compose Down
       run : docker compose down
