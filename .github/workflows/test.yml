@@ -35,8 +35,8 @@ jobs:
     - name : Build the Docker Image
       run : docker build . --file Dockerfile --tag demo-app
 
-    - name : Creating docker network
-      run : docker network create docker-network
+    - name: Create Docker Network
+      run: docker network create docker-network || true
 
     - name : Docker Compose Up
       run : docker compose up -d
@@ -46,12 +46,14 @@ jobs:
 
     - name: Run Postman Tests with Newman
       run: |
-       docker run --rm \
-         -v ${{ github.workspace }}:/etc/newman \
-         postman/newman:latest run /etc/newman/postman_collection.json \
-         -e /etc/newman/postman_environment.json \
-         --reporters cli,json \
-         --reporter-json-export /etc/newman/newman-report.json
+        docker run --rm \
+          --network docker-network \
+          -v ${{ github.workspace }}:/etc/newman \
+          postman/newman:latest run /etc/newman/postman_collection.json \
+          -e /etc/newman/postman_environment.json \
+          --reporters cli,json \
+          --reporter-json-export /etc/newman/newman-report.json
+      timeout-minutes: 10
 
     - name: Publish Test Results to GitHub Packages
       run: |

@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   demo:
     build:
@@ -30,10 +29,24 @@ services:
     networks:
       - docker-network
 
+  # Add this Newman service to your Docker Compose
+  newman:
+    image: postman/newman:latest
+    volumes:
+      - .:/etc/newman
+    networks:
+      - docker-network
+    depends_on:
+      - demo
+    command: >
+      run /etc/newman/postman_collection.json 
+      -e /etc/newman/postman_environment.json 
+      --reporters cli,json 
+      --reporter-json-export /etc/newman/newman-report.json
+
 networks:
   docker-network:
     driver: bridge
-    external: true
 
 volumes:
   pgdata:
