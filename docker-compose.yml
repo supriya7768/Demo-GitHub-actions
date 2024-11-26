@@ -1,4 +1,5 @@
-version: '3'
+version: '3.8'
+
 services:
   demo:
     build:
@@ -15,6 +16,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
     networks:
       - docker-network
+      - host-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   postgres:
     image: postgres:16
@@ -28,25 +32,13 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - docker-network
-
-  # Add this Newman service to your Docker Compose
-  newman:
-    image: postman/newman:latest
-    volumes:
-      - .:/etc/newman
-    networks:
-      - docker-network
-    depends_on:
-      - demo
-    command: >
-      run /etc/newman/postman_collection.json 
-      -e /etc/newman/postman_environment.json 
-      --reporters cli,json 
-      --reporter-json-export /etc/newman/newman-report.json
+      - host-network
 
 networks:
   docker-network:
     driver: bridge
+  host-network:
+    driver: host
 
 volumes:
   pgdata:
