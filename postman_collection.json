@@ -16,54 +16,45 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"// Setting request body dynamically\r",
-									"pm.request.body = {\r",
-									"    mode: 'raw',\r",
-									"    raw: JSON.stringify({\r",
-									"        id : 1,\r",
-									"        name: \"Pintu\",\r",
-									"        city: \"Pune\",\r",
-									"        balance: 1000\r",
-									"    })\r",
-									"};\r",
-									"\r",
-									"// Set header for JSON payload\r",
-									"pm.request.headers.add({ key: \"Content-Type\", value: \"application/json\" });\r",
-									"\r",
-									"// Log the request body for debugging\r",
-									"console.log(\"Pre-request body:\", pm.request.body);\r",
-									""
+									"// Setting request body dynamically",
+									"pm.request.body = {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({",
+									"        id: {{account_id}},",
+									"        name: \"{{account_name}}\",",
+									"        city: \"{{account_city}}\",",
+									"        balance: {{account_balance}}",
+									"    })",
+									"};",
+									"// Set header for JSON payload",
+									"pm.request.headers.add({ key: \"Content-Type\", value: \"application/json\" });",
+									"// Log the request body for debugging",
+									"console.log(\"Pre-request body:\", pm.request.body);"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Validate status code\r",
-									"pm.test(\"Status code is 201\", function () {\r",
-									"    pm.response.to.have.status(201);\r",
-									"});\r",
-									"\r",
-									"// Parse the response body\r",
-									"const responseData = pm.response.json();\r",
-									"\r",
-									"// Validate response fields\r",
-									"pm.test(\"Response contains expected fields\", function () {\r",
-									"    pm.expect(responseData).to.have.property(\"id\", 1);\r",
-									"    pm.expect(responseData).to.have.property(\"name\", \"Pintuu\");\r",
-									"    pm.expect(responseData).to.have.property(\"city\", \"Pune\");\r",
-									"    pm.expect(responseData).to.have.property(\"balance\", 1000);\r",
-									"});\r",
-									"\r",
-									"// Log the response for debugging\r",
-									"console.log(\"Post-response body:\", responseData);\r",
-									""
+									"// Validate status code",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"// Parse the response body",
+									"const responseData = pm.response.json();",
+									"// Validate response fields",
+									"pm.test(\"Response contains expected fields\", function () {",
+									"    pm.expect(responseData).to.have.property(\"id\", {{account_id}});",
+									"    pm.expect(responseData).to.have.property(\"name\", \"{{account_name}}\");",
+									"    pm.expect(responseData).to.have.property(\"city\", \"{{account_city}}\");",
+									"    pm.expect(responseData).to.have.property(\"balance\", {{account_balance}});",
+									"});",
+									"// Log the response for debugging",
+									"console.log(\"Post-response body:\", responseData);"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -72,7 +63,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Pintu\",\r\n    \"city\": \"Pune\",\r\n    \"balance\" : 1000\r\n}",
+							"raw": "{\n    \"name\": \"{{account_name}}\",\n    \"city\": \"{{account_city}}\",\n    \"balance\": {{account_balance}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -80,12 +71,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://demo-github-actions-demo:8080/account",
+							"raw": "http://{{base_url}}:{{port}}/account",
 							"protocol": "http",
 							"host": [
-								"demo-github-actions-demo"
+								"{{base_url}}"
 							],
-							"port": "8080",
+							"port": "{{port}}",
 							"path": [
 								"account"
 							]
@@ -99,12 +90,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://demo-github-actions-demo:8080/account",
+							"raw": "http://{{base_url}}:{{port}}/account",
 							"protocol": "http",
 							"host": [
-								"demo-github-actions-demo"
+								"{{base_url}}"
 							],
-							"port": "8080",
+							"port": "{{port}}",
 							"path": [
 								"account"
 							]
@@ -116,14 +107,7 @@
 					"name": "Update Name",
 					"request": {
 						"method": "PUT",
-						"header": [
-							{
-								"key": "",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "",
@@ -134,20 +118,20 @@
 							}
 						},
 						"url": {
-							"raw": "http://demo-github-actions-demo:8080/account/1?name=Bittu",
+							"raw": "http://{{base_url}}:{{port}}/account/{{account_id}}?name={{updated_name}}",
 							"protocol": "http",
 							"host": [
-								"demo-github-actions-demo"
+								"{{base_url}}"
 							],
-							"port": "8080",
+							"port": "{{port}}",
 							"path": [
 								"account",
-								"1"
+								"{{account_id}}"
 							],
 							"query": [
 								{
 									"key": "name",
-									"value": "Bittu"
+									"value": "{{updated_name}}"
 								}
 							]
 						}
@@ -160,15 +144,15 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://demo-github-actions-demo:8080/account/1",
+							"raw": "http://{{base_url}}:{{port}}/account/{{account_id}}",
 							"protocol": "http",
 							"host": [
-								"demo-github-actions-demo"
+								"{{base_url}}"
 							],
-							"port": "8080",
+							"port": "{{port}}",
 							"path": [
 								"account",
-								"1"
+								"{{account_id}}"
 							]
 						}
 					},

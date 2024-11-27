@@ -45,8 +45,15 @@ jobs:
       run: docker pull postman/newman:latest
    
     - name: Run Tests using Newman
-      run: docker run --network docker-network -v ${{ github.workspace }}:/workspace postman/newman:latest run /workspace/postman_collection.json --reporters cli,html --reporter-html-export /workspace/newman-report.html
-   
+      run: |
+        docker run --network docker-network \
+          -v ${{ github.workspace }}:/workspace \
+          postman/newman:latest run /workspace/postman_collection.json \
+          --environment /workspace/postman_environment.json \
+          --iteration-data /workspace/data.json \
+          --reporters cli,html \
+          --reporter-html-export /workspace/newman-report.html
+
     - name: Docker Compose Down
       run: docker compose down
 
