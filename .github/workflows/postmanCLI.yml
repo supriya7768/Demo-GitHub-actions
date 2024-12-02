@@ -48,9 +48,8 @@ jobs:
 
     - name: Authenticate Postman CLI
       env:
-        POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
-      run: |
-        postman login --api-key $POSTMAN_API_KEY
+       POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+      run: postman login
 
     - name: Run Tests using Postman CLI
       run: |
