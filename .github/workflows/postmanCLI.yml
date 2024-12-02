@@ -60,7 +60,6 @@ jobs:
         postman collection run ./postman_collection.json \
           --environment ./postman_environment.json \
           --iteration-data ./data.json \
-          --reporter-json ./postman-report.json
 
     - name: Convert JSON Report to HTML
       run: |
