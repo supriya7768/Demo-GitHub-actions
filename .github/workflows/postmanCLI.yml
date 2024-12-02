@@ -46,8 +46,9 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install Postman CLI
-      run: npm install -g @postman/cli
+    - name: Download and Install Postman CLI
+      run: |
+          curl -L https://dl-cli.pstmn.io/install/linux64.sh | sh
 
     - name: Authenticate Postman CLI
       run: postman login --api-key ${{ secrets.POSTMAN_API_KEY }}
