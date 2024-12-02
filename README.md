@@ -28,7 +28,7 @@ Before starting, ensure you have the following installed:
 
 #### 1.1 Clone the Repository
 ```bash
-[git clone https://github.com/supriya7768/Demo-GitHub-actions.git
+git clone https://github.com/supriya7768/Demo-GitHub-actions.git
 ```
 
 #### 1.2 Checkout to the Main Branch
