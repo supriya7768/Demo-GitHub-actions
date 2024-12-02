@@ -51,7 +51,9 @@ jobs:
           curl -L https://dl-cli.pstmn.io/install/linux64.sh | sh
 
     - name: Authenticate Postman CLI
-      run: postman login --api-key ${{ secrets.POSTMAN_API_KEY }}
+      env:
+       POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+      run: postman login
 
     - name: Run Tests using Postman CLI
       run: |
