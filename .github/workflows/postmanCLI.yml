@@ -60,7 +60,7 @@ jobs:
         postman collection run ./postman_collection.json \
           --environment ./postman_environment.json \
           --iteration-data ./data.json \
-          --reporter-html-export ./postman-report.html
+          --reporter-html ./postman-report.html
 
     - name: Docker Compose Down
       run: docker compose down
