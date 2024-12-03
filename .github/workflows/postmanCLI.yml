@@ -72,7 +72,7 @@ jobs:
         POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
 
     - name: Upload JSON Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: postman-json-report
         path: postman-report.json
