@@ -67,12 +67,12 @@ jobs:
       id: fetch-report
       run: |
         REPORT_URL=$(cat postman-link.txt | sed 's/\r//')
-        curl -o postman-report.json "$REPORT_URL"
+        curl -H "X-API-Key: ${{ secrets.POSTMAN_API_KEY }}" -o postman-report.json "$REPORT_URL"
       env:
         POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
 
     - name: Upload JSON Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: postman-json-report
         path: postman-report.json
