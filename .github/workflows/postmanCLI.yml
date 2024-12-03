@@ -69,10 +69,12 @@ jobs:
     - name: Fetch Report JSON
       id: fetch-report
       run: |
-        REPORT_URL=$(cat postman-link.txt | sed 's/\r//')
-        curl -H "X-API-Key: ${{ secrets.POSTMAN_API_KEY }}" -o postman-report.json "$REPORT_URL"
+          RUN_ID=$(cat postman-link.txt | awk -F'/' '{print $NF}')
+          curl -X GET "https://api.getpostman.com/runs/$RUN_ID" \
+            -H "X-API-Key: ${{ secrets.POSTMAN_API_KEY }}" \
+            -o postman-report.json
       env:
-        POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }} 
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }} 
 
     - name: Docker Compose Down
       run: docker compose down
