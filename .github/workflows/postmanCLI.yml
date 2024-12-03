@@ -55,21 +55,21 @@ jobs:
 
     - name: Run Tests using Postman CLI
       run: |
-        postman collection run "34754472-8e67c07c-449c-4531-b84d-4613f9daf778" -e "34754472-d2cb780d-2ccc-4ac8-8018-1cf33196e82b"
-
-    - name: Install jq
-      run: |
-        sudo apt-get install jq
-        jq -r '.[] | "<tr><td>\(.name)</td><td>\(.value)</td></tr>"' ./postman-report.json > postman-report.html
-
-    - name: Convert JSON Report to HTML
-      run: json2html -i ./postman-report.json -o postman-report.html
-
+        postman collection run "34754472-8e67c07c-449c-4531-b84d-4613f9daf778" \
+          -e "34754472-d2cb780d-2ccc-4ac8-8018-1cf33196e82b" \
+          --report-json-export postman-report.json \
+          --report-html-export postman-report.html
     - name: Docker Compose Down
       run: docker compose down
 
-    - name: Upload Postman CLI Report
+    - name: Upload JSON Report
       uses: actions/upload-artifact@v3
       with:
-        name: postman-report
+        name: postman-json-report
+        path: postman-report.json
+    
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: postman-html-report
         path: postman-report.html
