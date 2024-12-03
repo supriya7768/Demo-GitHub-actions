@@ -57,13 +57,18 @@ jobs:
       run: |
         postman collection run "34754472-8e67c07c-449c-4531-b84d-4613f9daf778" \
           -e "34754472-d2cb780d-2ccc-4ac8-8018-1cf33196e82b" \
-          > postman-output.txt
        
     - name: Docker Compose Down
       run: docker compose down
 
-    - name: Upload Postman CLI Output
+    - name: Upload JSON Report
       uses: actions/upload-artifact@v3
       with:
-        name: postman-cli-output
-        path: postman-output.txt
+        name: postman-json-report
+        path: postman-report.json
+    
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: postman-html-report
+        path: postman-report.html
