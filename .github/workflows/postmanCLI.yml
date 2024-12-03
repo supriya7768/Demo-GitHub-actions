@@ -2,12 +2,8 @@ name: Build and Test Project
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches:
+      - main-test
 
 jobs:
   build-and-deploy:
@@ -50,22 +46,48 @@ jobs:
       run: |
           curl -L https://dl-cli.pstmn.io/install/linux64.sh | sh
 
+    # Modified Step
     - name: Authenticate Postman CLI
-      env:
-       POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
-      run: postman login
+      run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
 
+    - name: Check Running Containers
+      run: docker ps
+
+    # This was giving issues, have modified postman_collection.json file to solve issues
     - name: Run Tests using Postman CLI
       run: |
         postman collection run ./postman_collection.json \
           --environment ./postman_environment.json \
           --iteration-data ./data.json \
 
-    - name: Convert JSON Report to HTML
+    # - name: Convert JSON Report to HTML
+    #   run: |
+    #     # Install any necessary JSON to HTML converter (custom script or tool)
+    #     # Example for a placeholder command
+    #     json-to-html ./postman-report.json > postman-report.html
+
+    # # New Step added
+    # - name: Install JSON to HTML Converter
+    #   run: |
+    #     npm install -g json2html
+    #     echo "Adding npm global bin to PATH"
+    #     echo "$(npm bin -g)" >> $GITHUB_PATH
+    #     json2html --help
+
+    # - name: Install json2html-cli
+    #   run: |
+    #     npm install -g json2html-cli
+    #     json2html-cli -i ./postman-report.json -o postman-report.html
+
+    - name: Install jq
       run: |
-        # Install any necessary JSON to HTML converter (custom script or tool)
-        # Example for a placeholder command
-        json-to-html ./postman-report.json > postman-report.html
+        sudo apt-get install jq
+        jq -r '.[] | "<tr><td>\(.name)</td><td>\(.value)</td></tr>"' ./postman-report.json > postman-report.html
+
+
+    # New Step added
+    - name: Convert JSON Report to HTML
+      run: json2html -i ./postman-report.json -o postman-report.html
 
     - name: Docker Compose Down
       run: docker compose down
