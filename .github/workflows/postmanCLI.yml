@@ -60,8 +60,11 @@ jobs:
           -e "34754472-d2cb780d-2ccc-4ac8-8018-1cf33196e82b" > postman-output.txt
         grep "You can view the run data in Postman at" postman-output.txt | awk '{print $NF}' > postman-link.txt
 
-    - name: Docker Compose Down
-      run: docker compose down
+    - name: Upload Postman CLI Output
+      uses: actions/upload-artifact@v3
+      with:
+        name: postman-cli-output
+        path: postman-link.txt
 
     - name: Fetch Report JSON
       id: fetch-report
@@ -70,6 +73,9 @@ jobs:
         curl -H "X-API-Key: ${{ secrets.POSTMAN_API_KEY }}" -o postman-report.json "$REPORT_URL"
       env:
         POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }} 
+
+    - name: Docker Compose Down
+      run: docker compose down
 
     - name: Upload Postman CLI Output
       uses: actions/upload-artifact@v3
