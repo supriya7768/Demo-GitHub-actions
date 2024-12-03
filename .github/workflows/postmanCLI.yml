@@ -69,7 +69,13 @@ jobs:
         REPORT_URL=$(cat postman-link.txt | sed 's/\r//')
         curl -H "X-API-Key: ${{ secrets.POSTMAN_API_KEY }}" -o postman-report.json "$REPORT_URL"
       env:
-        POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+        POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }} 
+
+    - name: Upload Postman CLI Output
+      uses: actions/upload-artifact@v3
+      with:
+        name: postman-cli-output
+        path: postman-output.txt
 
     - name: Upload JSON Report
       uses: actions/upload-artifact@v3
