@@ -5,7 +5,7 @@ on:
       branches: [ "main" ]
     pull_request:
       branches: [ "main" ]
-      
+
 permissions:
     contents: read
 
@@ -53,19 +53,14 @@ jobs:
     - name: Authenticate Postman CLI
       run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
 
-    - name: Check Running Containers
-      run: docker ps
-
     - name: Run Tests using Postman CLI
       run: |
-        postman collection run ./postman_collection.json \
-          --environment ./postman_environment.json \
-          --iteration-data ./data.json \
+        postman collection run "34754472-8e67c07c-449c-4531-b84d-4613f9daf778" -e "34754472-d2cb780d-2ccc-4ac8-8018-1cf33196e82b"
 
-    - name: Install jq
-      run: |
-        sudo apt-get install jq
-        jq -r '.[] | "<tr><td>\(.name)</td><td>\(.value)</td></tr>"' ./postman-report.json > postman-report.html
+    # - name: Install jq
+    #   run: |
+    #     sudo apt-get install jq
+    #     jq -r '.[] | "<tr><td>\(.name)</td><td>\(.value)</td></tr>"' ./postman-report.json > postman-report.html
 
     - name: Convert JSON Report to HTML
       run: json2html -i ./postman-report.json -o postman-report.html
