@@ -1,13 +1,13 @@
 name: Build and Test Project
 
 on:
-    push:
-      branches: [ "main" ]
-    pull_request:
-      branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
   build-and-deploy:
@@ -60,33 +60,28 @@ jobs:
           -e "34754472-d2cb780d-2ccc-4ac8-8018-1cf33196e82b" > postman-output.txt
         grep "You can view the run data in Postman at" postman-output.txt | awk '{print $NF}' > postman-link.txt
 
-    - name: Upload Postman CLI Output
+    - name: Fetch HTML Report
+      id: fetch-html-report
+      run: |
+          REPORT_URL=$(cat postman-link.txt | tr -d '\r')
+          curl -o postman-report.html "$REPORT_URL"
+      env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+
+    - name: Upload Postman CLI Link
       uses: actions/upload-artifact@v3
       with:
-        name: postman-cli-output
+        name: postman-link
         path: postman-link.txt
 
-    - name: Fetch Report JSON
-      id: fetch-report
-      run: |
-          RUN_ID=$(cat postman-link.txt | awk -F'/' '{print $NF}')
-          curl -X GET "https://api.getpostman.com/runs/$RUN_ID" \
-            -H "X-API-Key: ${{ secrets.POSTMAN_API_KEY }}" \
-            -o postman-report.json
-      env:
-          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }} 
-
-    - name: Docker Compose Down
-      run: docker compose down
-
     - name: Upload Postman CLI Output
       uses: actions/upload-artifact@v3
       with:
-        name: postman-cli-output
+        name: postman-output
         path: postman-output.txt
 
-    - name: Upload JSON Report
+    - name: Upload HTML Report
       uses: actions/upload-artifact@v3
       with:
-        name: postman-json-report
-        path: postman-report.json
+        name: postman-html-report
+        path: postman-report.html
